@@ -4,7 +4,7 @@ import io.github.nwrenger.disabledimensionsreimagined.config.Config;
 import io.github.nwrenger.disabledimensionsreimagined.config.Dimension;
 import io.github.nwrenger.disabledimensionsreimagined.platform.Services;
 import java.util.Objects;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 public class Common {
@@ -22,7 +22,10 @@ public class Common {
         );
     }
 
-    public static boolean isDimensionDisabled(Identifier id, Entity entity) {
+    public static boolean isDimensionDisabled(
+        ResourceLocation id,
+        Entity entity
+    ) {
         Dimension dimension = config.getDimension(id);
         if (dimension == null) {
             return false;

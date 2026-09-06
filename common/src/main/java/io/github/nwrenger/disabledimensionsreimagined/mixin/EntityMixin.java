@@ -31,7 +31,7 @@ public class EntityMixin {
 
         if (
             !Common.isDimensionDisabled(
-                newLevel.dimension().identifier(),
+                newLevel.dimension().location(),
                 entity
             )
         ) {

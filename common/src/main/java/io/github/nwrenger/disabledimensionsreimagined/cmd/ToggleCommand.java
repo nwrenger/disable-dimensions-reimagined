@@ -9,10 +9,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public final class ToggleCommand {
 
@@ -24,7 +24,7 @@ public final class ToggleCommand {
             Common.getConfig()
                 .dimensions.keySet()
                 .stream()
-                .map(Identifier::parse),
+                .map(ResourceLocation::parse),
             builder
         );
 
@@ -32,18 +32,21 @@ public final class ToggleCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> create() {
         return Commands.literal("toggle").then(
-            Commands.argument("dimension", IdentifierArgument.id())
+            Commands.argument("dimension", ResourceLocationArgument.id())
                 .suggests(DIMENSIONS)
                 .executes(context ->
                     toggle(
                         context.getSource(),
-                        IdentifierArgument.getId(context, "dimension")
+                        ResourceLocationArgument.getId(context, "dimension")
                     )
                 )
         );
     }
 
-    private static int toggle(CommandSourceStack source, Identifier id) {
+    private static int toggle(
+        CommandSourceStack source,
+        ResourceLocation id
+    ) {
         Dimension dimension = Common.getConfig().getDimension(id);
         if (dimension == null) {
             return notConfigured(source, id);
@@ -54,7 +57,7 @@ public final class ToggleCommand {
 
     private static int setDisabled(
         CommandSourceStack source,
-        Identifier id,
+        ResourceLocation id,
         boolean disabled
     ) {
         Config config = Common.getConfig();
@@ -88,7 +91,10 @@ public final class ToggleCommand {
         return 1;
     }
 
-    private static int notConfigured(CommandSourceStack source, Identifier id) {
+    private static int notConfigured(
+        CommandSourceStack source,
+        ResourceLocation id
+    ) {
         source.sendFailure(
             Command.header("command.toggle.title", "Toggle")
                 .append(
@@ -105,7 +111,7 @@ public final class ToggleCommand {
         return 0;
     }
 
-    private static Component success(Identifier id, boolean disabled) {
+    private static Component success(ResourceLocation id, boolean disabled) {
         MutableComponent message = Command.header(
             "command.toggle.title",
             "Toggle"

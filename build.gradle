@@ -1,16 +1,16 @@
 plugins {
     id 'base'
     // see https://maven.fabricmc.net/fabric-loom/fabric-loom.gradle.plugin/maven-metadata.xml for new versions
-    id 'net.fabricmc.fabric-loom' version '1.16.3' apply false
+    id 'fabric-loom' version '1.11-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '2.0.141' apply false
+    id 'net.neoforged.moddev' version '2.0.115' apply false
 }
 
 def exportName = mod_id.replace('_', '-')
 
 def modProjects = [
-        fabric  : project(':fabric'),
-        neoforge: project(':neoforge')
+        fabric  : [project: project(':fabric'), task: 'remapJar'],
+        neoforge: [project: project(':neoforge'), task: 'jar']
 ]
 
 tasks.register('export', Sync) {
@@ -20,9 +20,10 @@ tasks.register('export', Sync) {
     into(layout.buildDirectory.dir('libs'))
 
     modProjects.each { loader, modProject ->
-        dependsOn(modProject.tasks.named('jar'))
+        def jarTask = modProject.project.tasks.named(modProject.task)
+        dependsOn(jarTask)
 
-        from(modProject.tasks.named('jar', Jar).flatMap { it.archiveFile }) {
+        from(jarTask.flatMap { it.archiveFile }) {
             rename { "${exportName}-${version}-${loader}.jar" }
         }
     }

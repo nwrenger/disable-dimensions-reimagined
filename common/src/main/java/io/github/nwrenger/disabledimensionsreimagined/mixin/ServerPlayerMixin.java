@@ -53,7 +53,7 @@ public class ServerPlayerMixin implements DimensionTravel {
         }
 
         Dimension dimension = Common.getConfig().getDimension(
-            newLevel.dimension().identifier()
+            newLevel.dimension().location()
         );
         if (dimension == null) {
             return;
@@ -74,7 +74,7 @@ public class ServerPlayerMixin implements DimensionTravel {
     ) {
         ServerPlayer player = (ServerPlayer) (Object) this;
 
-        Dimension dimension = Common.getConfig().getDimension(to.identifier());
+        Dimension dimension = Common.getConfig().getDimension(to.location());
         if (dimension == null) {
             return;
         }
@@ -150,10 +150,11 @@ public class ServerPlayerMixin implements DimensionTravel {
         ServerPlayer player,
         Message message
     ) {
-        player.sendOverlayMessage(
+        player.displayClientMessage(
             Component.literal(message.text).withColor(
                 TextColor.parseColor(message.color).result().get().getValue()
-            )
+            ),
+            true
         );
 
         player.addEffect(
