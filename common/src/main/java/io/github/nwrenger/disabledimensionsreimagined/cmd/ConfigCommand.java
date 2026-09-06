@@ -65,10 +65,7 @@ public class ConfigCommand {
             .append(Component.literal(id).withColor(Command.DIMENSION_COLOR))
             .append("\n")
             .append(
-                detailLabel(
-                    "command.config.dimension.status.label",
-                    "Status"
-                )
+                detailLabel("command.config.dimension.status.label", "Status")
             )
             .append(
                 status(
@@ -78,10 +75,7 @@ public class ConfigCommand {
             )
             .append("\n")
             .append(
-                detailLabel(
-                    "command.config.dimension.message.label",
-                    "Message"
-                )
+                detailLabel("command.config.dimension.message.label", "Message")
             )
             .append(Component.literal("\"").withStyle(ChatFormatting.DARK_GRAY))
             .append(
@@ -165,10 +159,7 @@ public class ConfigCommand {
             );
     }
 
-    private static MutableComponent detailLabel(
-        String key,
-        String fallback
-    ) {
+    private static MutableComponent detailLabel(String key, String fallback) {
         return Component.literal("  ")
             .append(
                 Command.translation(key, fallback).withStyle(
@@ -211,9 +202,7 @@ public class ConfigCommand {
             Command.translation(
                 "command.config.condition.status.context",
                 "following this condition"
-            ).withStyle(
-                    ChatFormatting.GOLD
-            ),
+            ).withStyle(ChatFormatting.GOLD),
             statusText(disabled)
         ).withStyle(ChatFormatting.WHITE);
     }
@@ -221,13 +210,11 @@ public class ConfigCommand {
     private static MutableComponent statusText(boolean disabled) {
         return disabled
             ? Command.translation(
-                "command.state.disabled",
-                "disabled"
-            ).withStyle(
-                ChatFormatting.RED
-            )
+                  "command.state.disabled",
+                  "disabled"
+              ).withStyle(ChatFormatting.RED)
             : Command.translation("command.state.enabled", "enabled").withStyle(
-                ChatFormatting.GREEN
-            );
+                  ChatFormatting.GREEN
+              );
     }
 }
