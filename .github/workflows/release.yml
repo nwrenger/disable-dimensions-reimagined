@@ -198,13 +198,65 @@ jobs:
             git push --atomic origin "${tags_to_push[@]}"
           fi
 
+      - name: Prepare release description
+        id: release_description
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          previous_tag=""
+          while IFS= read -r tag; do
+            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ && "$tag" != "$RELEASE_VERSION" ]]; then
+              previous_tag=$tag
+              break
+            fi
+          done < <(git tag --list --sort=-version:refname)
+
+          notes=$RELEASE_NOTES
+          if [[ -z "$notes" ]]; then
+            request=$(jq -n \
+              --arg tag "$RELEASE_VERSION" \
+              --arg previous "$previous_tag" \
+              '{tag_name: $tag} + if $previous == "" then {} else {previous_tag_name: $previous} end')
+
+            notes=$(curl --fail-with-body --silent --show-error --location \
+              --request POST \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              --data "$request" | jq --raw-output '.body // ""')
+          fi
+
+          notes=$(printf '%s\n' "$notes" | sed '/^\*\*Full Changelog\*\*: /d')
+          description="$RUNNER_TEMP/release-description.md"
+
+          if [[ -n "$notes" ]]; then
+            printf '%s\n\n' "$notes" > "$description"
+          else
+            : > "$description"
+          fi
+
+          if [[ -n "$previous_tag" ]]; then
+            printf '**Full Changelog**: %s/%s/commits/%s...%s\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$previous_tag" "$RELEASE_VERSION" \
+              >> "$description"
+          else
+            printf '**Full Changelog**: %s/%s/commits/%s\n' \
+              "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$RELEASE_VERSION" \
+              >> "$description"
+          fi
+
+          echo "path=$description" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
           target_commitish: main
           name: Disable Dimensions Reimagined ${{ inputs.version }}
-          body: ${{ inputs.release_notes }}
-          generate_release_notes: ${{ inputs.release_notes == '' }}
+          body_path: ${{ steps.release_description.outputs.path }}
           fail_on_unmatched_files: true
           files: release-artifacts/*.jar
