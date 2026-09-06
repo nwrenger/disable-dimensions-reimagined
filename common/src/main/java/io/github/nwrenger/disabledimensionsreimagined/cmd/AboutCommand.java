@@ -101,16 +101,15 @@ public final class AboutCommand {
     }
 
     @NonNull
-    private static MutableComponent link(
-        @NonNull Component text,
-        String url
-    ) {
-        return text.copy().withStyle(style ->
-            style
-                .withItalic(true)
-                .withColor(ChatFormatting.AQUA)
-                .withClickEvent(Command.openUrl(url))
-        );
+    private static MutableComponent link(@NonNull Component text, String url) {
+        return text
+            .copy()
+            .withStyle(style ->
+                style
+                    .withItalic(true)
+                    .withColor(ChatFormatting.AQUA)
+                    .withClickEvent(Command.openUrl(url))
+            );
     }
 
     @NonNull

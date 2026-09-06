@@ -43,10 +43,7 @@ public final class ToggleCommand {
         );
     }
 
-    private static int toggle(
-        CommandSourceStack source,
-        ResourceLocation id
-    ) {
+    private static int toggle(CommandSourceStack source, ResourceLocation id) {
         Dimension dimension = Common.getConfig().getDimension(id);
         if (dimension == null) {
             return notConfigured(source, id);
