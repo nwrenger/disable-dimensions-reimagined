@@ -59,10 +59,10 @@ jobs:
       matrix:
         branch:
           - main
-          - 26.1
+          - "26.1"
           - 1.21.11
           - 1.21.9
-          - 1.21
+          - "1.21"
     env:
       RELEASE_VERSION: ${{ inputs.version }}
 
@@ -98,16 +98,22 @@ jobs:
 
           ./gradlew build "-Pversion=${RELEASE_VERSION}+${minecraft_version}"
 
-          printf '%s\t%s\n' "$GITHUB_SHA" "$minecraft_version" \
+          for loader in fabric neoforge; do
+            test -s "build/libs/disable-dimensions-reimagined-${RELEASE_VERSION}+${minecraft_version}-${loader}.jar"
+          done
+
+          printf '%s\t%s\n' "$(git rev-parse HEAD)" "$minecraft_version" \
             > "build/libs/source-${{ matrix.branch }}.txt"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.branch }}
-          path: build/libs/*
+          path: |
+            build/libs/*.jar
+            build/libs/source-*.txt
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
 
   release:
     name: Publish release
@@ -137,6 +143,7 @@ jobs:
           create_tag() {
             local tag=$1
             local commit=$2
+            local existing_commit
 
             if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
               git fetch --force origin "refs/tags/$tag:refs/tags/$tag"
@@ -165,10 +172,18 @@ jobs:
             fi
 
             IFS=$'\t' read -r commit minecraft_version < "$metadata"
-            if [[ -z "$commit" || -z "$minecraft_version" ]]; then
+            if [[ ! "$commit" =~ ^[0-9a-f]{40}$ || ! "$minecraft_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
               echo "Invalid source metadata for branch $branch."
               exit 1
             fi
+
+            if ! git cat-file -e "$commit^{commit}"; then
+              git fetch origin "$commit"
+            fi
+
+            for loader in fabric neoforge; do
+              test -s "release-artifacts/disable-dimensions-reimagined-${RELEASE_VERSION}+${minecraft_version}-${loader}.jar"
+            done
 
             if [[ "$branch" == "main" ]]; then
               main_commit=$commit
