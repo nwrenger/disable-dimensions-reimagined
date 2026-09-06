@@ -3,8 +3,6 @@ package io.github.nwrenger.disabledimensionsreimagined.cmd;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.github.nwrenger.disabledimensionsreimagined.Constants;
-import java.net.URI;
-import java.util.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -12,7 +10,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.server.permissions.Permissions;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -35,11 +32,7 @@ public final class Command {
         @NonNull String name
     ) {
         return Commands.literal(name)
-            .requires(source ->
-                source
-                    .permissions()
-                    .hasPermission(Permissions.COMMANDS_GAMEMASTER)
-            )
+            .requires(source -> source.hasPermission(2))
             .then(
                 Commands.literal("about").executes(context ->
                     AboutCommand.run(context.getSource())
@@ -131,6 +124,6 @@ public final class Command {
 
     @NonNull
     public static ClickEvent openUrl(String url) {
-        return new ClickEvent.OpenUrl(Objects.requireNonNull(URI.create(url)));
+        return new ClickEvent(ClickEvent.Action.OPEN_URL, url);
     }
 }

@@ -15,8 +15,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,13 +36,13 @@ public class ServerPlayerMixin implements DimensionTravel {
     @Unique
     private boolean disabledimensionsreimagined$allowed = false;
 
-    @Inject(method = "teleport", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "changeDimension", at = @At("HEAD"), cancellable = true)
     private void disabledimensionsreimagined$disableDimensionTravel(
-        final TeleportTransition transition,
-        CallbackInfoReturnable<ServerPlayer> callback
+        final DimensionTransition transition,
+        CallbackInfoReturnable<Entity> callback
     ) {
         ServerPlayer player = (ServerPlayer) (Object) this;
-        ServerLevel currentLevel = player.level();
+        ServerLevel currentLevel = player.serverLevel();
         ServerLevel newLevel = transition.newLevel();
 
         if (newLevel.dimension() == currentLevel.dimension()) {
@@ -53,7 +54,7 @@ public class ServerPlayerMixin implements DimensionTravel {
         }
 
         Dimension dimension = Common.getConfig().getDimension(
-            newLevel.dimension().identifier()
+            newLevel.dimension().location()
         );
         if (dimension == null) {
             return;
@@ -74,7 +75,7 @@ public class ServerPlayerMixin implements DimensionTravel {
     ) {
         ServerPlayer player = (ServerPlayer) (Object) this;
 
-        Dimension dimension = Common.getConfig().getDimension(to.identifier());
+        Dimension dimension = Common.getConfig().getDimension(to.location());
         if (dimension == null) {
             return;
         }
@@ -93,15 +94,15 @@ public class ServerPlayerMixin implements DimensionTravel {
                 dimension.message
             );
         } else {
-            TeleportTransition transition =
+            DimensionTransition transition =
                 player.findRespawnPositionAndUseSpawnBlock(
                     false,
-                    TeleportTransition.DO_NOTHING
+                    DimensionTransition.DO_NOTHING
                 );
 
             this.disabledimensionsreimagined$teleportBack(
                 player,
-                transition.position(),
+                transition.pos(),
                 transition.yRot(),
                 transition.xRot(),
                 transition.newLevel().dimension(),
@@ -137,8 +138,7 @@ public class ServerPlayerMixin implements DimensionTravel {
                 position.z,
                 Set.of(),
                 yRot,
-                xRot,
-                false
+                xRot
             );
         } finally {
             this.disabledimensionsreimagined$allowed = false;
@@ -150,15 +150,16 @@ public class ServerPlayerMixin implements DimensionTravel {
         ServerPlayer player,
         Message message
     ) {
-        player.sendOverlayMessage(
+        player.displayClientMessage(
             Component.literal(message.text).withColor(
                 TextColor.parseColor(message.color).result().get().getValue()
-            )
+            ),
+            true
         );
 
         player.addEffect(
             new MobEffectInstance(
-                MobEffects.SLOWNESS,
+                MobEffects.MOVEMENT_SLOWDOWN,
                 20,
                 5,
                 true,

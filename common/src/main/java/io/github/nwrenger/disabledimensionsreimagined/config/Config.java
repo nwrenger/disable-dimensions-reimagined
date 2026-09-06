@@ -11,7 +11,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public class Config {
@@ -29,7 +29,7 @@ public class Config {
     public Map<String, Dimension> dimensions = defaults();
 
     @Nullable
-    public Dimension getDimension(Identifier key) {
+    public Dimension getDimension(ResourceLocation key) {
         return dimensions.get(key.toString());
     }
 
@@ -109,7 +109,7 @@ public class Config {
             if (
                 dimensionId == null ||
                 !dimensionId.contains(":") ||
-                Identifier.tryParse(dimensionId) == null
+                ResourceLocation.tryParse(dimensionId) == null
             ) {
                 throw new IllegalStateException(
                     "[Disable Dimensions Reimagined] Invalid dimension ID: " +

@@ -6,7 +6,7 @@ import io.github.nwrenger.disabledimensionsreimagined.Constants;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.arguments.item.ItemPredicateArgument;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -67,7 +67,7 @@ public class Condition {
     }
 
     private static void validateIdentifier(Condition condition) {
-        if (Identifier.tryParse(condition.value) == null) {
+        if (ResourceLocation.tryParse(condition.value) == null) {
             throw invalidValue(condition);
         }
     }
@@ -155,7 +155,7 @@ public class Condition {
     }
 
     private static boolean hasAdvancement(ServerPlayer player, String value) {
-        Identifier id = Identifier.tryParse(value);
+        ResourceLocation id = ResourceLocation.tryParse(value);
         if (id == null) {
             return false;
         }
@@ -173,7 +173,10 @@ public class Condition {
     }
 
     private static boolean hasGamemode(ServerPlayer player, String gamemode) {
-        return player.gameMode().getName().equals(gamemode);
+        return player.gameMode
+            .getGameModeForPlayer()
+            .getName()
+            .equals(gamemode);
     }
 
     private static boolean hasPlaytime(ServerPlayer player, String timeStr) {
@@ -191,7 +194,7 @@ public class Condition {
     private static boolean hasDay(Entity entity, String timeStr) {
         int neededDay = Integer.parseInt(timeStr);
 
-        long dayTicks = entity.level().getOverworldClockTime();
+        long dayTicks = entity.level().getDayTime();
         int completedDays = ticksToIngameDays(dayTicks);
 
         return completedDays >= neededDay;
@@ -266,7 +269,7 @@ public class Condition {
     }
 
     private static boolean hasTag(Entity entity, String tag) {
-        return entity.entityTags().contains(tag);
+        return entity.getTags().contains(tag);
     }
 
     private static boolean hasTeam(Entity entity, String name) {

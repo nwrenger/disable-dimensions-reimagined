@@ -143,11 +143,11 @@ public final class AboutCommand {
 
     @NonNull
     private static ClickEvent runCommand(@NonNull String command) {
-        return new ClickEvent.RunCommand(command);
+        return new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
     }
 
     @NonNull
     private static ClickEvent suggestCommand(@NonNull String command) {
-        return new ClickEvent.SuggestCommand(command);
+        return new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command);
     }
 }

@@ -182,7 +182,9 @@ public class ConfigCommand {
         return Component.literal(disabled ? "☒" : "☑").withStyle(style ->
             style
                 .withColor(disabled ? ChatFormatting.RED : ChatFormatting.GREEN)
-                .withHoverEvent(new HoverEvent.ShowText(hover))
+                .withHoverEvent(
+                    new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover)
+                )
         );
     }
 
