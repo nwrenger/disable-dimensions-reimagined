@@ -1,0 +1,167 @@
+name: release version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing base release version without a Minecraft suffix (for example, 0.1.0)
+        required: true
+        type: string
+      branch:
+        description: Branch containing the Minecraft version to release
+        required: true
+        type: choice
+        options:
+          - main
+          - "26.1"
+          - 1.21.11
+          - 1.21.9
+          - "1.21"
+      release_notes:
+        description: Optional Markdown release description
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.version }}-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release ${{ inputs.branch }}
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Checkout ${{ inputs.branch }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Validate release
+        id: release
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must use the format X.Y.Z, for example 0.1.0."
+            exit 1
+          fi
+
+          if ! git rev-parse --verify "$RELEASE_VERSION^{commit}" >/dev/null 2>&1; then
+            echo "Base release tag $RELEASE_VERSION does not exist."
+            exit 1
+          fi
+
+          minecraft_version=$(sed -n 's/^minecraft_version=//p' gradle.properties)
+          if [[ ! "$minecraft_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "minecraft_version is missing or invalid in gradle.properties."
+            exit 1
+          fi
+
+          full_version="$RELEASE_VERSION+$minecraft_version"
+          source_commit=$(git rev-parse HEAD)
+
+          if git rev-parse --verify "$full_version^{commit}" >/dev/null 2>&1; then
+            existing_commit=$(git rev-list -n 1 "$full_version")
+            if [[ "$existing_commit" != "$source_commit" ]]; then
+              echo "Tag $full_version already exists on a different commit."
+              exit 1
+            fi
+          fi
+
+          echo "minecraft_version=$minecraft_version" >> "$GITHUB_OUTPUT"
+          echo "full_version=$full_version" >> "$GITHUB_OUTPUT"
+          echo "source_commit=$source_commit" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: "25"
+          distribution: microsoft
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build
+        env:
+          FULL_VERSION: ${{ steps.release.outputs.full_version }}
+          MINECRAFT_VERSION: ${{ steps.release.outputs.minecraft_version }}
+        run: |
+          ./gradlew build "-Pversion=$FULL_VERSION"
+
+          for loader in fabric neoforge; do
+            test -s "build/libs/disable-dimensions-reimagined-${FULL_VERSION}-${loader}.jar"
+          done
+
+      - name: Create version tag
+        env:
+          FULL_VERSION: ${{ steps.release.outputs.full_version }}
+          SOURCE_COMMIT: ${{ steps.release.outputs.source_commit }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$FULL_VERSION" >/dev/null 2>&1; then
+            echo "Tag $FULL_VERSION already points to the expected commit."
+          else
+            git tag "$FULL_VERSION" "$SOURCE_COMMIT"
+            git push origin "refs/tags/$FULL_VERSION"
+          fi
+
+      - name: Prepare release description
+        id: release_description
+        shell: bash
+        env:
+          BASE_VERSION: ${{ inputs.version }}
+          FULL_VERSION: ${{ steps.release.outputs.full_version }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+        run: |
+          notes=$RELEASE_NOTES
+          if [[ -z "$notes" ]]; then
+            request=$(jq -n \
+              --arg tag "$FULL_VERSION" \
+              --arg previous "$BASE_VERSION" \
+              '{tag_name: $tag, previous_tag_name: $previous}')
+
+            notes=$(curl --fail-with-body --silent --show-error --location \
+              --request POST \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer $GH_TOKEN" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              --data "$request" | jq --raw-output '.body // ""')
+          fi
+
+          notes=$(printf '%s\n' "$notes" | sed '/^\*\*Full Changelog\*\*: /d')
+          description="$RUNNER_TEMP/release-description.md"
+
+          if [[ -n "$notes" ]]; then
+            printf '%s\n\n' "$notes" > "$description"
+          else
+            : > "$description"
+          fi
+
+          printf '**Full Changelog**: %s/%s/commits/%s...%s\n' \
+            "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$BASE_VERSION" "$FULL_VERSION" \
+            >> "$description"
+
+          echo "path=$description" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.full_version }}
+          target_commitish: ${{ steps.release.outputs.source_commit }}
+          name: Disable Dimensions Reimagined ${{ steps.release.outputs.full_version }}
+          body_path: ${{ steps.release_description.outputs.path }}
+          fail_on_unmatched_files: true
+          files: build/libs/*.jar
