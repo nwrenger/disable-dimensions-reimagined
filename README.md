@@ -57,7 +57,7 @@ or
 
 ### Language Support
 
-Translated text is available for supported languages. This is mainly intended for server admins, since the configurable messages shown to players can be customized anyway. This gets packaged with the mod, so no extra downloads are required.
+Translated text is available for supported languages. This is primarily intended for server admins, since the messages shown to players can be customized. The language files are bundled with the mod, so clients must also install it to see translated command text.
 
 To add new translations, please refer to [this README](https://github.com/nwrenger/disable-dimensions-reimagined/tree/main/TRANSLATION.md).
 
