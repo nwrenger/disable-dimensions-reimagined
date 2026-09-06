@@ -1,0 +1,34 @@
+plugins {
+    id 'base'
+    // see https://maven.fabricmc.net/fabric-loom/fabric-loom.gradle.plugin/maven-metadata.xml for new versions
+    id 'net.fabricmc.fabric-loom' version '1.16.3' apply false
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '2.0.141' apply false
+}
+
+def exportName = mod_id.replace('_', '-')
+
+def modProjects = [
+        fabric  : project(':fabric'),
+        neoforge: project(':neoforge')
+]
+
+tasks.register('export', Sync) {
+    group = 'build'
+    description = 'Exports the Fabric and NeoForge mod jars to the root build/libs directory.'
+
+    into(layout.buildDirectory.dir('libs'))
+
+    modProjects.each { loader, modProject ->
+        dependsOn(modProject.tasks.named('jar'))
+
+        from(modProject.tasks.named('jar', Jar).flatMap { it.archiveFile }) {
+            rename { "${exportName}-${version}-${loader}.jar" }
+        }
+    }
+}
+
+tasks.named('build') {
+    dependsOn(':common:build', ':fabric:build', ':neoforge:build')
+    dependsOn(tasks.named('export'))
+}

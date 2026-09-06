@@ -1,0 +1,31 @@
+{
+  "disable_dimensions_reimagined.command.header": "%1$s von %2$s",
+  "disable_dimensions_reimagined.command.state.now": "jetzt",
+  "disable_dimensions_reimagined.command.state.enabled": "aktiviert",
+  "disable_dimensions_reimagined.command.state.disabled": "deaktiviert",
+
+  "disable_dimensions_reimagined.command.about.other_projects": "Sieh dir meine anderen Projekte an",
+  "disable_dimensions_reimagined.command.about.issue_prefix": "Wenn du ein Problem mit diesem Mod hast, melde es",
+  "disable_dimensions_reimagined.command.about.issue_link": "hier",
+  "disable_dimensions_reimagined.command.about.config": "Überprüfe die aktive Konfiguration mit",
+  "disable_dimensions_reimagined.command.about.reload": "Lade Konfigurationsänderungen neu mit",
+  "disable_dimensions_reimagined.command.about.toggle": "Schalte den Status einer Dimension um mit",
+
+  "disable_dimensions_reimagined.command.toggle.title": "Umschalten",
+  "disable_dimensions_reimagined.command.toggle.save_failure": "Die Konfiguration konnte nicht gespeichert werden",
+  "disable_dimensions_reimagined.command.toggle.not_configured": "%1$s ist nicht konfiguriert",
+
+  "disable_dimensions_reimagined.command.config.title": "Konfiguration",
+  "disable_dimensions_reimagined.command.config.empty": "Keine Dimensionseinträge konfiguriert.",
+  "disable_dimensions_reimagined.command.config.dimension.status.label": "Status",
+  "disable_dimensions_reimagined.command.config.dimension.status.hover": "Betreten von %1$s ist %2$s %3$s",
+  "disable_dimensions_reimagined.command.config.dimension.message.label": "Nachricht",
+  "disable_dimensions_reimagined.command.config.dimension.conditions.label": "Bedingungen",
+  "disable_dimensions_reimagined.command.config.dimension.conditions.empty": "Keine",
+  "disable_dimensions_reimagined.command.config.condition.status.hover": "Betreten %1$s wird %2$s",
+  "disable_dimensions_reimagined.command.config.condition.status.context": "unter dieser Bedingung",
+
+  "disable_dimensions_reimagined.command.reload.title": "Neu laden",
+  "disable_dimensions_reimagined.command.reload.success": "Erfolgreich",
+  "disable_dimensions_reimagined.command.reload.failure": "Fehlgeschlagen"
+}
