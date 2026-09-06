@@ -98,11 +98,14 @@ jobs:
 
           ./gradlew build "-Pversion=${RELEASE_VERSION}+${minecraft_version}"
 
+          printf '%s\t%s\n' "$GITHUB_SHA" "$minecraft_version" \
+            > "build/libs/source-${{ matrix.branch }}.txt"
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.branch }}
-          path: build/libs/*.jar
+          path: build/libs/*
           if-no-files-found: error
           retention-days: 1
 
@@ -112,12 +115,73 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Download build artifacts
         uses: actions/download-artifact@v7
         with:
           pattern: build-*
           path: release-artifacts
           merge-multiple: true
+
+      - name: Create source tags
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          declare -a tags_to_push=()
+
+          create_tag() {
+            local tag=$1
+            local commit=$2
+
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              git fetch --force origin "refs/tags/$tag:refs/tags/$tag"
+              existing_commit=$(git rev-list -n 1 "$tag")
+
+              if [[ "$existing_commit" != "$commit" ]]; then
+                echo "Tag $tag already exists on a different commit."
+                exit 1
+              fi
+
+              echo "Tag $tag already points to the expected commit."
+              return
+            fi
+
+            git tag "$tag" "$commit"
+            tags_to_push+=("refs/tags/$tag")
+          }
+
+          main_commit=""
+
+          for branch in main 26.1 1.21.11 1.21.9 1.21; do
+            metadata="release-artifacts/source-$branch.txt"
+            if [[ ! -f "$metadata" ]]; then
+              echo "Missing source metadata for branch $branch."
+              exit 1
+            fi
+
+            IFS=$'\t' read -r commit minecraft_version < "$metadata"
+            if [[ -z "$commit" || -z "$minecraft_version" ]]; then
+              echo "Invalid source metadata for branch $branch."
+              exit 1
+            fi
+
+            if [[ "$branch" == "main" ]]; then
+              main_commit=$commit
+            fi
+
+            create_tag "$RELEASE_VERSION+$minecraft_version" "$commit"
+          done
+
+          create_tag "$RELEASE_VERSION" "$main_commit"
+
+          if (( ${#tags_to_push[@]} > 0 )); then
+            git push --atomic origin "${tags_to_push[@]}"
+          fi
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
