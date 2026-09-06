@@ -191,7 +191,7 @@ public class Condition {
     private static boolean hasDay(Entity entity, String timeStr) {
         int neededDay = Integer.parseInt(timeStr);
 
-        long dayTicks = entity.level().getOverworldClockTime();
+        long dayTicks = entity.level().getDayTime();
         int completedDays = ticksToIngameDays(dayTicks);
 
         return completedDays >= neededDay;
@@ -266,7 +266,7 @@ public class Condition {
     }
 
     private static boolean hasTag(Entity entity, String tag) {
-        return entity.entityTags().contains(tag);
+        return entity.getTags().contains(tag);
     }
 
     private static boolean hasTeam(Entity entity, String name) {

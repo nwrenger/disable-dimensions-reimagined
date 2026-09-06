@@ -1,7 +1,7 @@
 package io.github.nwrenger.disabledimensionsreimagined.mixin;
 
 import io.github.nwrenger.disabledimensionsreimagined.DimensionTravel;
-import net.minecraft.advancements.triggers.ChangeDimensionTrigger;
+import net.minecraft.advancements.criterion.ChangeDimensionTrigger;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;

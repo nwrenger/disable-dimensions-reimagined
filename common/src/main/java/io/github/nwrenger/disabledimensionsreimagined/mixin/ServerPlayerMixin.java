@@ -150,10 +150,11 @@ public class ServerPlayerMixin implements DimensionTravel {
         ServerPlayer player,
         Message message
     ) {
-        player.sendOverlayMessage(
+        player.displayClientMessage(
             Component.literal(message.text).withColor(
                 TextColor.parseColor(message.color).result().get().getValue()
-            )
+            ),
+            true
         );
 
         player.addEffect(
