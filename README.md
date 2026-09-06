@@ -12,7 +12,7 @@ It's the official successor to the **Disable Dimensions** data pack/mod utilizin
 
 > Perfect for modded multiplayer servers where you want to disable further dimensions to prevent players from progressing too fast.
 
-[![Disable Dimensions Reimagined showcase](https://i.ytimg.com/vi/qZd6TwWhyfw/maxresdefault.jpg)](https://www.youtube.com/watch?v=3bVRtYwfQ1I)
+[![Disable Dimensions Reimagined showcase](https://i.ytimg.com/vi/qZd6TwWhyfw/maxresdefault.jpg)](https://www.youtube.com/watch?v=qZd6TwWhyfw)
 
 ## Why use this mod?
 
