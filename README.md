@@ -6,7 +6,7 @@
 
 A **seamless, grief-resistant solution** for preventing players from entering **The Nether**, **The End**, and any further **custom dimensions**, with optional per-dimension **conditions**.
 
-Allows you to disable dimensions by intercepting teleportation, seamlessly preventing players and entities from entering. Each dimension can be `enabled` or `disabled` independently, with optional [conditions](#conditions) that overrides that status.
+Allows you to disable dimensions by intercepting teleportation, seamlessly preventing players and entities from entering. Each dimension can be `enabled` or `disabled` independently, with optional [conditions](#conditions) that override that status.
 
 It's the official successor to the **Disable Dimensions** data pack/mod utilizing the full capabilities of Minecraft modding.
 
@@ -152,11 +152,11 @@ Each condition requires:
   - `DAY`: Checks the in-game day count. The value is the at least required day count.
   - `GAMEMODE`: Checks the player's current gamemode. The value can be `survival`, `creative`, `adventure`, or `spectator`.
   - `GAMETIME`: Checks how long the world has been running. The value is given in seconds, so use a formula like `day_count * 24 * 60 * 60` for days. This time only advances while the world is running, so server downtime affects accuracy.
-  - `ITEM`: Checks the items inside the player's inventory. The value is an item ID with an optional item component filter, for example `minecraft:diamond[count=64]`.
+  - `ITEM`: Checks the items inside the entity's inventory. The value is an item ID with an optional item component filter, for example `minecraft:diamond[count=64]`.
   - `PLAYTIME`: Checks the player's playtime. The value is given in seconds, so use a formula like `hours * 60 * 60` for hours. This time only advances while the player is online, so offline time does not count.
-  - `SCORE`: Checks the player's scoreboard scores. The value uses the format `objective_name=score_value`, for example `nether_entries=5`.
-  - `TAG`: Checks the player's tags. You can give players custom tags, like `enter_nether`.
-  - `TEAM`: Checks the player's team. The value is the team name, for example `red_team`.
+  - `SCORE`: Checks the entity's scoreboard scores. The value uses the format `objective_name=score_value`, for example `nether_entries=5`.
+  - `TAG`: Checks the entity's tags. You can give players custom tags, like `enter_nether`.
+  - `TEAM`: Checks the entity's team. The value is the team name, for example `red_team`.
 - `value`: The specific value to check against. Its format depends on the selected type.
 - `disabled`: The disabled value which overwrites the current status if the condition applies.
 
