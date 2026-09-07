@@ -4,7 +4,7 @@
 [![modrinth](https://img.shields.io/badge/dynamic/json?url=https://api.modrinth.com/v2/project/disable-dimensions-reimagined&label=downloads&query=$.downloads&color=#00AF5C)](https://modrinth.com/mod/disable-dimensions-reimagined)
 [![modrinth](https://img.shields.io/modrinth/game-versions/disable-dimensions-reimagined.svg)](https://modrinth.com/mod/disable-dimensions-reimagined)
 
-A **native, seamless, grief-resistant solution** for preventing players from entering **The Nether**, **The End**, and any further **custom dimensions**, with optional per-dimension **conditions**.
+A **seamless, grief-resistant solution** for preventing players from entering **The Nether**, **The End**, and any further **custom dimensions**, with optional per-dimension **conditions**.
 
 Allows you to disable dimensions by intercepting the teleportation itself, so players seamlessly cannot enter. Each dimension can be separately `enabled` or `disabled`, with optional conditions which override that status.
 
