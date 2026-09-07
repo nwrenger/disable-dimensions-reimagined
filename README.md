@@ -6,7 +6,7 @@
 
 A **seamless, grief-resistant solution** for preventing players from entering **The Nether**, **The End**, and any further **custom dimensions**, with optional per-dimension **conditions**.
 
-Allows you to disable dimensions by intercepting the teleportation itself, so players seamlessly cannot enter. Each dimension can be separately `enabled` or `disabled`, with optional conditions which override that status.
+Allows you to disable dimensions by intercepting teleportation, seamlessly preventing players and entities from entering. Each dimension can be `enabled` or `disabled` independently, with optional [conditions](#conditions) that overrides that status.
 
 It's the official successor to the **Disable Dimensions** data pack/mod utilizing the full capabilities of Minecraft modding.
 
@@ -16,18 +16,16 @@ It's the official successor to the **Disable Dimensions** data pack/mod utilizin
 
 ## Why use this mod?
 
-1. **Native**:
-   All logic is implemented directly in Java, with no tick-based checks. This results in a seamless experience for players, with no lag or stutter when they try to enter a disabled dimension.
+1. **Efficient**:
+   All logic is implemented directly in Java and uses event-driven logic. This keeps the performance overhead minimal.
 2. **Comprehensive Coverage**:
-   Works in every situation. For all players and entities (ender pearls), teleportation commands, and more. The teleportation is normally intercepted before it even happens, so players are never actually in the disabled dimension. See [Edge Cases](#edge-cases) for the handful of scenarios that require manual cleanup.
+   Works for all players and entities (ender pearls), teleportation commands, and more. See [Edge Cases](#edge-cases) for the handful of scenarios that require manual cleanup.
 3. **Immersive Feedback**:
    On the teleport interception, players see a short action bar message, hear a subtle sound cue and get a slowness effect applied, making the experience clear and responsive.
 4. **Compatible and Flexible**:
    Fully compatible with any modded and custom dimensions setups right out of the box. It also includes built-in language support.
-5. **Server-Ready**:
-   Built to be reliable, grief-resistant, and completely passive, with no extra overhead through tick-based checks. Perfect for public or semi-public multiplayer servers.
-6. **Extensive Configuration**:
-   Can be adjusted in real time through the reload and toggle commands, no restarts required. Via conditions, you can disable dimension for a specific time, for specific players, and so on. Look at the [Conditions](#conditions) section for more information.
+5. **Extensive Configuration**:
+   Can be adjusted in real time through the reload and toggle commands, no restarts required. The active config can be reviewed with the config command.
 
 > **TL;DR**: A stable and lightweight way to stop unwanted dimension travel, made to just work.
 
@@ -246,10 +244,10 @@ or
 
 ## Edge Cases
 
-This mod is intentionally on the teleportation event, with a few rare transitions requiring manual cleanup or resulting in different from expected behavior:
+The mod primarily intercepts teleportation, but a few rare transitions require manual cleanup or may behave differently than expected:
 
 1. **Respawn in disabled dimension**:
-   If a respawn point via a respawn anchor or the `spawnpoint` command is set inside a dimension that later gets disabled, the player will continue to respawn there until the respawn point is cleared or reset.
+   If a respawn point via a respawn anchor, the `spawnpoint` command, or the world spawn is set inside a dimension that later gets disabled, the player will continue to respawn there until the respawn point is cleared or updated accordingly.
 2. **Already inside on disable**:
    Players who are already in The Nether, The End, or a custom dimension when it gets disabled will remain there until they change dimensions. Teleport them out if needed.
 
