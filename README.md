@@ -168,8 +168,8 @@ Here are three examples of conditions:
 
 ```json
 {
-  "type": "DAY",
-  "value": "3",
+  "type": "GAMETIME",
+  "value": "259200",
   "disabled": false
 }
 ```
