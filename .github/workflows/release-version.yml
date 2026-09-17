@@ -150,7 +150,7 @@ jobs:
             : > "$description"
           fi
 
-          printf '**Full Changelog**: %s/%s/commits/%s...%s\n' \
+          printf '**Full Changelog**: %s/%s/compare/%s...%s\n' \
             "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$BASE_VERSION" "$FULL_VERSION" \
             >> "$description"
 
