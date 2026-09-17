@@ -240,7 +240,7 @@ jobs:
           fi
 
           if [[ -n "$previous_tag" ]]; then
-            printf '**Full Changelog**: %s/%s/commits/%s...%s\n' \
+            printf '**Full Changelog**: %s/%s/compare/%s...%s\n' \
               "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$previous_tag" "$RELEASE_VERSION" \
               >> "$description"
           else
